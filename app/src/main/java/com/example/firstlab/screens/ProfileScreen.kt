@@ -1,52 +1,55 @@
+// screens/ProfileScreen.kt (Código simplificado)
+
 package com.example.firstlab.screens
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.firstlab.data.SessionManager // <-- Importar el gestor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen() {
-    var isLoggedIn by remember { mutableStateOf(false) } // Estado de la sesión
+
+    // 💡 Lee el estado observable
+    val isLoggedIn = SessionManager.isLoggedIn
 
     Scaffold(
-        topBar = { CenterAlignedTopAppBar(title = { Text("Mi Perfil - WikiLol") }) },
-        modifier = Modifier.fillMaxSize()
-    ) { paddingValues ->
+        topBar = { CenterAlignedTopAppBar(title = { Text("Perfil de Usuario") }) }
+    ) { innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
+                .padding(innerPadding)
+                .padding(32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            if (isLoggedIn) {
+            // Muestra el estado actual
+            Text(
+                text = if (isLoggedIn) "¡Bienvenido! Sesión Activa" else "Sesión Cerrada. Por favor, inicia sesión.",
+                style = MaterialTheme.typography.headlineMedium
+            )
+
+            Spacer(Modifier.height(32.dp))
+
+            // Botón de Login/Logout
+            Button(
+                onClick = {
+                    if (isLoggedIn) {
+                        SessionManager.logout()
+                    } else {
+                        SessionManager.login()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(0.6f)
+            ) {
                 Text(
-                    text = "Bienvenido, Invocador!",
-                    style = MaterialTheme.typography.headlineLarge
+                    text = if (isLoggedIn) "Cerrar Sesión" else "Iniciar Sesión"
                 )
-                Spacer(Modifier.height(8.dp))
-                Text(
-                    text = "Nivel de cuenta: 300",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-                Spacer(Modifier.height(32.dp))
-                Button(onClick = { isLoggedIn = false }) {
-                    Text("Cerrar Sesión (Logout)")
-                }
-            } else {
-                Text(
-                    text = "Inicia sesión para gestionar tus favoritos.",
-                    style = MaterialTheme.typography.headlineLarge
-                )
-                Spacer(Modifier.height(32.dp))
-                Button(onClick = { isLoggedIn = true }) {
-                    Text("Iniciar Sesión (Login)")
-                }
             }
         }
     }

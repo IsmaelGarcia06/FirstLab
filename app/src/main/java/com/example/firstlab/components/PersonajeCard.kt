@@ -18,6 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.firstlab.R
+import com.example.firstlab.data.SessionManager
 import com.example.firstlab.model.Personaje // Asumiendo que está aquí
 import com.example.firstlab.ui.theme.FavoriteRed // Asumiendo que está aquí
 
@@ -27,7 +28,8 @@ fun PersonajeCard(
     onPersonajeClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
-    // 💡 Usa MaterialTheme.colorScheme.surface (oscuro en tu tema personalizado)
+    val isLoggedIn = SessionManager.isLoggedIn
+    val isFavoriteNow = SessionManager.isFavorite(personaje.id)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -68,16 +70,17 @@ fun PersonajeCard(
             }
 
             // Botón de Favorito
-            IconButton(onClick = onFavoriteClick) {
-                Icon(
-                    imageVector = if (personaje.isFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
-                    contentDescription = "Añadir a favoritos",
-                    // Usa el color personalizado FavoriteRed
-                    tint = if (personaje.isFavorite)
-                        MaterialTheme.colorScheme.secondary
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
+            IconButton(
+                onClick = onFavoriteClick,
+                enabled = isLoggedIn
+            ) {
+                val isFavoriteNow = SessionManager.isFavorite(personaje.id)
+                val tintColor = if (isLoggedIn) FavoriteRed else MaterialTheme.colorScheme.onSurfaceVariant
 
+                Icon(
+                    imageVector = if (isFavoriteNow) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                    contentDescription = "Añadir a favoritos",
+                    tint = tintColor
                 )
             }
         }

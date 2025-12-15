@@ -23,7 +23,7 @@ fun getDummyPersonajes(): List<Personaje> {
             habilidadR = "Rayo final",
             imagenResourceId = R.drawable.lux_icon,
             comentarios = comentariosLux,
-            isFavorite = true // Marcar como favorito para pruebas
+            isFavorite = false
         ),
         Personaje(
             id = 2,
@@ -51,7 +51,7 @@ fun getDummyPersonajes(): List<Personaje> {
             habilidadR = "Supermegacohete de la muerte",
             imagenResourceId = R.drawable.jinx_icon,
             comentarios = emptyList(),
-            isFavorite = true
+            isFavorite = false
         )
     )
 }

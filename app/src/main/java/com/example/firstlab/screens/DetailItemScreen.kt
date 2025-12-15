@@ -16,13 +16,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.firstlab.R
+import com.example.firstlab.data.SessionManager
 import com.example.firstlab.data.getPersonajeById
 import com.example.firstlab.ui.components.HabilidadTag
 import com.example.firstlab.ui.theme.FavoriteRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DetailItemScreen(personajeId: Int) {
+fun DetailItemScreen(personajeId: Int, modifier: Modifier = Modifier) {
     val personaje = remember(personajeId) { getPersonajeById(personajeId) }
 
     if (personaje == null) {
@@ -30,22 +31,35 @@ fun DetailItemScreen(personajeId: Int) {
         return
     }
 
+    // 💡 PASO 1: Leer el estado de la sesión y del favorito
+    val isLoggedIn = SessionManager.isLoggedIn
+    val isFavoriteNow = SessionManager.isFavorite(personajeId) // <-- Lee el estado actual
+
     Scaffold(
         topBar = { CenterAlignedTopAppBar(title = { Text(personaje.nombre) }) },
-        // Botón para incluir a favoritos
+
+        // Botón de Favorito FAB
         floatingActionButton = {
             Button(
-                onClick = { /* Lógica de añadir a favoritos */ },
+                // 💡 PASO 2: Conectar la acción al SessionManager
+                onClick = {
+                    SessionManager.toggleFavorite(personajeId)
+                },
+                // 💡 PASO 3: Deshabilitar si no ha iniciado sesión
+                enabled = isLoggedIn,
                 contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
             ) {
+                // 💡 PASO 4: Usar el estado actual para definir el icono
                 Icon(
-                    imageVector = if (personaje.isFavorite) Icons.Filled.Star else Icons.Outlined.StarBorder,
+                    imageVector = if (isFavoriteNow) Icons.Filled.Star else Icons.Outlined.StarBorder,
                     contentDescription = "Añadir a favoritos",
-                    tint = FavoriteRed
+                    // Cambiar el color si está deshabilitado
+                    tint = if (isLoggedIn) FavoriteRed else MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(Modifier.width(8.dp))
-                Text(if (personaje.isFavorite) "Favorito" else "Añadir a Favoritos")
+                Text(if (isFavoriteNow) "Quitar Favorito" else "Añadir a Favoritos")
             }
+
         }
     ) { paddingValues ->
         Column(

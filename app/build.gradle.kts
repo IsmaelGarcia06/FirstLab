@@ -50,13 +50,18 @@ android {
 }
 
 dependencies {
+    // DEPENDENCIAS EXISTENTES
     implementation("androidx.navigation:navigation-compose:2.7.5")
-    implementation("androidx.compose.material3:material3-window-size-class")
     implementation("androidx.compose.runtime:runtime-saveable")
     implementation("androidx.compose.material:material-icons-extended")
-
-    // Si estás usando Compose 3 (Material3), asegúrate de tener las bases:
+    implementation("androidx.compose.material3:material3-window-size-class:1.2.1")
     implementation("androidx.compose.material3:material3")
+    implementation("androidx.compose.ui:ui")
+
+    // 🔥 SOLUCIÓN DEFINITIVA PARA Modifier.weight(x.xf)
+    // ESTA LÍNEA ES LA QUE CONTIENE LA IMPLEMENTACIÓN DEL MODIFICADOR WEIGHT.
+    implementation("androidx.compose.foundation:foundation")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
