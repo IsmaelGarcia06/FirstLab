@@ -5,27 +5,54 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.* // Cambiado a .* para incluir mutableStateOf y getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.firstlab.data.getDummyPersonajes
-import com.example.firstlab.data.SessionManager // <-- ¡IMPORTANTE!
+import com.example.firstlab.data.SessionManager
 import com.example.firstlab.components.PersonajeCard
+import com.example.firstlab.model.Personaje // Asegúrate de tener esta importación
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FavListScreen(onItemClick: (Int) -> Unit) {
 
-    // 💡 PASO 1: Observar la lista de IDs favoritos del SessionManager
     val currentFavoriteIds = SessionManager.favoriteIds
 
-    // 💡 PASO 2: Obtener y filtrar la lista de personajes.
-    // Esta lista se recalcula CADA VEZ que currentFavoriteIds cambia.
+    // --- 1. NUEVOS ESTADOS PARA EL DIÁLOGO ---
+    var showDialog by remember { mutableStateOf(false) }
+    var personajeAEliminar by remember { mutableStateOf<Personaje?>(null) }
+
     val favoritos = remember(currentFavoriteIds) {
         getDummyPersonajes().filter { personaje ->
             currentFavoriteIds.contains(personaje.id)
         }
+    }
+
+    // --- 2. COMPONENTE DE VENTANA EMERGENTE ---
+    if (showDialog && personajeAEliminar != null) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text(text = "Quitar de favoritos") },
+            text = {
+                Text("¿Seguro que quieres eliminar a ${personajeAEliminar?.nombre} de tu lista de favoritos?")
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        personajeAEliminar?.let { SessionManager.toggleFavorite(it.id) }
+                        showDialog = false
+                    }
+                ) {
+                    Text("Eliminar", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog = false }) {
+                    Text("Cancelar")
+                }
+            }
+        )
     }
 
     Scaffold(
@@ -42,12 +69,12 @@ fun FavListScreen(onItemClick: (Int) -> Unit) {
                 items(favoritos, key = { it.id }) { personaje ->
                     PersonajeCard(
                         personaje = personaje,
-
-                        onPersonajeClick = {
-                        },
-
+                        onPersonajeClick = { },
                         onFavoriteClick = {
-                            SessionManager.toggleFavorite(personaje.id)
+                            // --- 3. CAMBIO DE LÓGICA ---
+                            // En lugar de borrar, guardamos el personaje y mostramos el diálogo
+                            personajeAEliminar = personaje
+                            showDialog = true
                         }
                     )
                 }
